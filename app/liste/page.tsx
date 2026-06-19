@@ -154,12 +154,19 @@ function ItemLine({
         )}
       </div>
 
-      {/* Prix */}
-      {item.price != null && (
-        <span className={`text-sm font-semibold flex-shrink-0 ${item.checked ? 'text-gray-400' : 'text-blue-500'}`}>
-          {item.price.toFixed(2)} €
-        </span>
-      )}
+      {/* Qté + Prix */}
+      <div className="flex flex-col items-end flex-shrink-0 gap-0.5">
+        {(item.quantity ?? 1) > 1 && (
+          <span className={`text-sm font-bold ${item.checked ? 'text-gray-400' : 'text-blue-500'}`}>
+            x{item.quantity}
+          </span>
+        )}
+        {item.price != null && (
+          <span className={`text-sm font-semibold ${item.checked ? 'text-gray-400' : 'text-gray-600'}`}>
+            {item.price.toFixed(2)} €
+          </span>
+        )}
+      </div>
     </button>
   )
 }

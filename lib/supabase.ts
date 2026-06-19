@@ -19,4 +19,5 @@ export type Item = {
   needed: boolean
   price?: number | null
   photo_url?: string | null
+  quantity?: number | null
 }
