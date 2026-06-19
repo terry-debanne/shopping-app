@@ -17,7 +17,7 @@ export default function Login() {
     } else if (k === '✓') {
       if (code === process.env.NEXT_PUBLIC_APP_PASSWORD) {
         document.cookie = 'app-auth=ok; path=/'
-        router.push('/')
+        window.location.href = '/'
       } else {
         setError(true)
         setCode('')
