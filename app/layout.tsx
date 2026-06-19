@@ -3,8 +3,13 @@ import './globals.css'
 import BottomNav from '@/components/BottomNav'
 
 export const metadata: Metadata = {
-  title: 'Liste de courses',
-  description: 'Gérez vos courses facilement',
+  title: 'Nos courses',
+  description: 'Liste de courses familiale',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Nos courses',
+  },
 }
 
 export const viewport: Viewport = {
