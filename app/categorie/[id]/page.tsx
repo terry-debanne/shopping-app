@@ -75,9 +75,6 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
         </div>
       )}
 
-      {editItem && (
-        <EditModal item={editItem} onClose={() => setEditItem(null)} onSaved={handleSaved} />
-      )}
     </div>
   )
 }
