@@ -14,6 +14,9 @@ export default function Catalogue() {
   const [newCatName, setNewCatName] = useState('')
   const [newCatEmoji, setNewCatEmoji] = useState('🛒')
   const [editItem, setEditItem] = useState<Item | null>(null)
+  const [editCat, setEditCat] = useState<Category | null>(null)
+  const [editCatName, setEditCatName] = useState('')
+  const [editCatEmoji, setEditCatEmoji] = useState('')
 
   useEffect(() => { fetchData() }, [])
 
@@ -63,6 +66,19 @@ export default function Catalogue() {
     if (hasItems) { alert('Supprimez d\'abord les articles de cette catégorie.'); return }
     setCategories(prev => prev.filter(c => c.id !== id))
     await supabase.from('categories').delete().eq('id', id)
+  }
+
+  function openEditCat(cat: Category) {
+    setEditCat(cat)
+    setEditCatName(cat.name)
+    setEditCatEmoji(cat.emoji)
+  }
+
+  async function saveCategory() {
+    if (!editCat || !editCatName.trim()) return
+    const { data } = await supabase.from('categories').update({ name: editCatName.trim(), emoji: editCatEmoji }).eq('id', editCat.id).select().single()
+    if (data) setCategories(prev => prev.map(c => c.id === data.id ? data : c).sort((a, b) => a.name.localeCompare(b.name)))
+    setEditCat(null)
   }
 
   function handleSaved(updated: Item) {
@@ -133,6 +149,22 @@ export default function Catalogue() {
         </Modal>
       )}
 
+      {/* Modal édition catégorie */}
+      {editCat && (
+        <Modal title="Modifier la catégorie" onClose={() => setEditCat(null)}>
+          <div className="flex gap-2 mb-3">
+            <input type="text" placeholder="Emoji" value={editCatEmoji} onChange={e => setEditCatEmoji(e.target.value)}
+              className="w-16 border border-gray-200 rounded-xl px-3 py-3 text-2xl text-center outline-none focus:border-blue-400"
+            />
+            <input autoFocus type="text" placeholder="Nom" value={editCatName} onChange={e => setEditCatName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && saveCategory()}
+              className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-lg outline-none focus:border-blue-400"
+            />
+          </div>
+          <button onClick={saveCategory} className="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold text-lg">Enregistrer</button>
+        </Modal>
+      )}
+
       {/* Modal édition article */}
       {editItem && (
         <EditModal item={editItem} categories={categories} onClose={() => setEditItem(null)} onSaved={handleSaved} />
@@ -144,7 +176,10 @@ export default function Catalogue() {
           <div key={category.id}>
             <div className="flex items-center justify-between mb-2 px-1">
               <h2 className="text-xs font-bold uppercase tracking-wider text-gray-400">{category.emoji} {category.name}</h2>
-              <button onClick={() => deleteCategory(category.id)} className="text-red-300 text-xs hover:text-red-500">Supprimer</button>
+              <div className="flex gap-3">
+                <button onClick={() => openEditCat(category)} className="text-blue-300 text-xs hover:text-blue-500">✏️</button>
+                <button onClick={() => deleteCategory(category.id)} className="text-red-300 text-xs hover:text-red-500">Supprimer</button>
+              </div>
             </div>
             <div className="space-y-2">
               {catItems.map(item => (
