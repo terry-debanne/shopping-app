@@ -85,6 +85,9 @@ export default function Catalogue() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">Catalogue</h1>
           <div className="flex gap-2">
+            <button onClick={() => { document.cookie = 'app-auth=; path=/; max-age=0'; window.location.href = '/login' }} className="text-sm bg-gray-100 text-gray-400 px-3 py-2 rounded-xl font-medium">
+              🔒
+            </button>
             <button onClick={() => setShowAddCategory(true)} className="text-sm bg-gray-200 text-gray-700 px-3 py-2 rounded-xl font-medium">
               + Catégorie
             </button>
