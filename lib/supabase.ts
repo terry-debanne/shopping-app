@@ -17,4 +17,6 @@ export type Item = {
   category_id: number
   category?: Category
   needed: boolean
+  price?: number | null
+  photo_url?: string | null
 }
