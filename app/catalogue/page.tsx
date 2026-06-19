@@ -174,10 +174,11 @@ export default function Catalogue() {
 function CatalogueRow({ item, onDelete, onEdit }: { item: Item; onDelete: (id: number) => void; onEdit: (i: Item) => void }) {
   return (
     <div className="flex items-center bg-white rounded-2xl px-4 py-3 shadow-sm gap-3">
-      {item.photo_url && (
+      {item.photo_url ? (
         <img src={item.photo_url} alt={item.name} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
+      ) : (
+        <div className="w-10 h-10 rounded-xl bg-gray-100 flex-shrink-0" />
       )}
-      {!item.photo_url && <span className="text-xl flex-shrink-0 opacity-30">📷</span>}
       <div className="flex-1 min-w-0">
         <p className="text-gray-800 font-medium">{item.name}</p>
         {item.price != null && <p className="text-xs text-blue-500 font-semibold">{item.price.toFixed(2)} €</p>}
