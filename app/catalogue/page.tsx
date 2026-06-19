@@ -177,7 +177,7 @@ function CatalogueRow({ item, onDelete, onEdit }: { item: Item; onDelete: (id: n
       {item.photo_url && (
         <img src={item.photo_url} alt={item.name} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
       )}
-      {!item.photo_url && <span className="text-xl flex-shrink-0">📷</span>}
+      {!item.photo_url && <span className="text-xl flex-shrink-0 opacity-30">📷</span>}
       <div className="flex-1 min-w-0">
         <p className="text-gray-800 font-medium">{item.name}</p>
         {item.price != null && <p className="text-xs text-blue-500 font-semibold">{item.price.toFixed(2)} €</p>}
@@ -203,12 +203,24 @@ function EditModal({ item, categories, onClose, onSaved }: {
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const ext = file.name.split('.').pop()
+    const ext = file.name.split('.').pop() ?? 'jpg'
     const path = `items/${item.id}-${Date.now()}.${ext}`
-    const { error } = await supabase.storage.from('item-photos').upload(path, file, { upsert: true })
+    const { error } = await supabase.storage.from('item-photos').upload(path, file, { upsert: true, contentType: file.type })
     if (!error) {
       const { data } = supabase.storage.from('item-photos').getPublicUrl(path)
-      setPhotoUrl(data.publicUrl)
+      const newUrl = data.publicUrl
+      setPhotoUrl(newUrl)
+      // Auto-sauvegarde immédiate après la photo
+      const updates = {
+        name: name.trim(),
+        category_id: categoryId,
+        price: price !== '' ? parseFloat(price) : null,
+        photo_url: newUrl,
+      }
+      const { data: saved } = await supabase.from('items').update(updates).eq('id', item.id).select('*, category:categories(*)').single()
+      if (saved) onSaved(saved)
+    } else {
+      alert('Erreur upload : ' + error.message)
     }
     setUploading(false)
   }

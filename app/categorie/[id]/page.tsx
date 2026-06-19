@@ -85,60 +85,69 @@ function ItemCard({ item, categoryEmoji, onToggle, onChangeQty }: {
   onChangeQty: (i: Item, delta: number) => void
 }) {
   const qty = item.quantity ?? 1
+  const [showPhoto, setShowPhoto] = useState(false)
 
   return (
-    <div className={`relative flex flex-col rounded-2xl shadow-sm overflow-hidden transition-all ${
-      item.needed ? 'bg-blue-500 shadow-blue-200 shadow-md' : 'bg-white'
-    }`}>
-      {/* Zone principale cliquable */}
-      <button
-        onClick={() => onToggle(item)}
-        className="flex flex-col items-center justify-center pt-3 pb-2 px-2 active:scale-95 transition-all"
-      >
-        {/* Photo ou emoji */}
-        <div className="relative mb-1">
-          {item.photo_url ? (
-            <img src={item.photo_url} alt={item.name} className="w-12 h-12 rounded-xl object-cover" />
-          ) : (
-            <span className={`text-3xl block ${item.needed ? '' : 'grayscale opacity-60'}`}>
-              {item.needed ? '✓' : categoryEmoji}
+    <>
+      <div className={`relative flex flex-col rounded-2xl shadow-sm overflow-hidden transition-all ${
+        item.needed ? 'bg-blue-500 shadow-blue-200 shadow-md' : 'bg-white'
+      }`}>
+        {/* Zone principale cliquable */}
+        <button
+          onClick={() => onToggle(item)}
+          className="flex flex-col items-center justify-center pt-3 pb-2 px-2 active:scale-95 transition-all"
+        >
+          {/* Photo ou emoji */}
+          <div className="relative mb-1">
+            {item.photo_url ? (
+              <img src={item.photo_url} alt={item.name} className="w-12 h-12 rounded-xl object-cover" />
+            ) : (
+              <span className={`text-3xl block ${item.needed ? '' : 'grayscale opacity-60'}`}>
+                {item.needed ? '✓' : categoryEmoji}
+              </span>
+            )}
+          </div>
+
+          <span className={`text-xs font-semibold text-center leading-tight px-1 ${item.needed ? 'text-white' : 'text-gray-600'}`}>
+            {item.name}
+          </span>
+
+          {item.price != null && (
+            <span className={`text-xs font-bold mt-0.5 ${item.needed ? 'text-blue-100' : 'text-blue-500'}`}>
+              {item.price.toFixed(2)} €
             </span>
           )}
-          {/* Icône photo uniquement si photo existe */}
-          {item.photo_url && !item.needed && (
-            <span className="absolute -top-1 -right-1 text-xs">📷</span>
-          )}
-        </div>
+        </button>
 
-        <span className={`text-xs font-semibold text-center leading-tight px-1 ${item.needed ? 'text-white' : 'text-gray-600'}`}>
-          {item.name}
-        </span>
-
-        {item.price != null && (
-          <span className={`text-xs font-bold mt-0.5 ${item.needed ? 'text-blue-100' : 'text-blue-500'}`}>
-            {item.price.toFixed(2)} €
-          </span>
+        {/* Icône 📷 cliquable — uniquement si photo existe */}
+        {item.photo_url && (
+          <button
+            onClick={() => setShowPhoto(true)}
+            className={`absolute top-1 right-1 text-base leading-none ${item.needed ? 'opacity-80' : 'opacity-60'}`}
+          >
+            📷
+          </button>
         )}
-      </button>
 
-      {/* Contrôle quantité — visible uniquement si needed */}
-      {item.needed && (
-        <div className="flex items-center justify-between px-2 pb-2">
-          <button
-            onClick={() => onChangeQty(item, -1)}
-            className="w-7 h-7 rounded-full bg-white/30 text-white font-bold text-lg flex items-center justify-center active:scale-90"
-          >
-            −
-          </button>
-          <span className="text-white font-bold text-base">{qty}</span>
-          <button
-            onClick={() => onChangeQty(item, +1)}
-            className="w-7 h-7 rounded-full bg-white/30 text-white font-bold text-lg flex items-center justify-center active:scale-90"
-          >
-            +
-          </button>
+        {/* Contrôle quantité — visible uniquement si needed */}
+        {item.needed && (
+          <div className="flex items-center justify-between px-2 pb-2">
+            <button onClick={() => onChangeQty(item, -1)} className="w-7 h-7 rounded-full bg-white/30 text-white font-bold text-lg flex items-center justify-center active:scale-90">−</button>
+            <span className="text-white font-bold text-base">{qty}</span>
+            <button onClick={() => onChangeQty(item, +1)} className="w-7 h-7 rounded-full bg-white/30 text-white font-bold text-lg flex items-center justify-center active:scale-90">+</button>
+          </div>
+        )}
+      </div>
+
+      {/* Plein écran photo */}
+      {showPhoto && item.photo_url && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowPhoto(false)}
+        >
+          <img src={item.photo_url} alt={item.name} className="max-w-full max-h-full rounded-2xl object-contain" />
         </div>
       )}
-    </div>
+    </>
   )
 }
