@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase, type Item, type Category } from '@/lib/supabase'
 
 type ItemWithChecked = Item & { checked: boolean }
@@ -125,48 +125,61 @@ function ItemLine({
   cat: Category | undefined
   onToggle: (id: number) => void
 }) {
+  const [showPhoto, setShowPhoto] = useState(false)
+
   return (
-    <button
-      onClick={() => onToggle(item.id)}
-      className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-left transition-all active:scale-98 ${
+    <>
+      <div className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-left transition-all ${
         item.checked ? 'bg-gray-100' : 'bg-white shadow-sm'
-      }`}
-    >
-      {/* Checkbox */}
-      <span className={`flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
-        item.checked ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'
       }`}>
-        {item.checked && <span className="text-sm font-bold">✓</span>}
-      </span>
+        {/* Checkbox */}
+        <button onClick={() => onToggle(item.id)} className={`flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
+          item.checked ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'
+        }`}>
+          {item.checked && <span className="text-sm font-bold">✓</span>}
+        </button>
 
-      {/* Photo miniature */}
-      {item.photo_url && (
-        <img src={item.photo_url} alt={item.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+        {/* Emoji catégorie */}
+        <span className="text-2xl flex-shrink-0">{cat?.emoji ?? '🛒'}</span>
+
+        {/* Nom + catégorie */}
+        <button onClick={() => onToggle(item.id)} className="flex-1 min-w-0 text-left">
+          <p className={`font-medium text-base ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+            {item.name}
+          </p>
+          {cat && (
+            <p className="text-xs text-gray-400">{cat.name}</p>
+          )}
+        </button>
+
+        {/* Qté + Prix */}
+        <button onClick={() => onToggle(item.id)} className="flex flex-col items-end flex-shrink-0 gap-0.5">
+          {(item.quantity ?? 1) > 1 && (
+            <span className={`text-sm font-bold ${item.checked ? 'text-gray-400' : 'text-blue-500'}`}>
+              x{item.quantity}
+            </span>
+          )}
+          {item.price != null && (
+            <span className={`text-sm font-semibold ${item.checked ? 'text-gray-400' : 'text-gray-600'}`}>
+              {item.price.toFixed(2)} €
+            </span>
+          )}
+        </button>
+
+        {/* Icône photo */}
+        {item.photo_url && (
+          <button onClick={() => setShowPhoto(true)} className="flex-shrink-0 text-xl opacity-60">
+            📷
+          </button>
+        )}
+      </div>
+
+      {/* Plein écran photo */}
+      {showPhoto && item.photo_url && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setShowPhoto(false)}>
+          <img src={item.photo_url} alt={item.name} className="max-w-full max-h-full rounded-2xl object-contain" />
+        </div>
       )}
-
-      {/* Nom + catégorie */}
-      <div className="flex-1 min-w-0">
-        <p className={`font-medium text-base ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>
-          {item.name}
-        </p>
-        {cat && (
-          <p className="text-xs text-gray-400">{cat.emoji} {cat.name}</p>
-        )}
-      </div>
-
-      {/* Qté + Prix */}
-      <div className="flex flex-col items-end flex-shrink-0 gap-0.5">
-        {(item.quantity ?? 1) > 1 && (
-          <span className={`text-sm font-bold ${item.checked ? 'text-gray-400' : 'text-blue-500'}`}>
-            x{item.quantity}
-          </span>
-        )}
-        {item.price != null && (
-          <span className={`text-sm font-semibold ${item.checked ? 'text-gray-400' : 'text-gray-600'}`}>
-            {item.price.toFixed(2)} €
-          </span>
-        )}
-      </div>
-    </button>
+    </>
   )
 }
