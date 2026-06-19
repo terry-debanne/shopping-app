@@ -91,10 +91,23 @@ export default function Liste() {
           <p className="text-sm mt-1">Sélectionne des articles depuis l&apos;accueil</p>
         </div>
       ) : (
-        <div className="space-y-1">
-          {/* Non cochés */}
-          {unchecked.map(item => (
-            <ItemLine key={item.id} item={item} cat={getCat(item.category_id)} onToggle={toggleChecked} />
+        <div className="space-y-4">
+          {/* Non cochés, groupés par catégorie */}
+          {categories
+            .filter(cat => unchecked.some(i => i.category_id === cat.id))
+            .map(cat => (
+              <div key={cat.id}>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 px-1 mb-1">{cat.emoji} {cat.name}</p>
+                <div className="space-y-1">
+                  {unchecked.filter(i => i.category_id === cat.id).map(item => (
+                    <ItemLine key={item.id} item={item} cat={cat} onToggle={toggleChecked} />
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+          {unchecked.filter(i => !i.category_id).map(item => (
+            <ItemLine key={item.id} item={item} cat={undefined} onToggle={toggleChecked} />
           ))}
 
           {/* Séparateur */}
